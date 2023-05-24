@@ -46,8 +46,10 @@ Se implemento una replica en base al modelo MASTER-SLAVE (replica primaria) que 
 
 1. Ir al archivo de configuración de MYSQL en el servidor MASTER, en este caso se puede llamar my.cnf (para linux) o my.ini (para Windows). Debajo de la seccion de [mysqld] editar:
 
-- server-id = 1
-- log-bin=mysql-bin
+```
+server-id = 1
+log-bin=mysql-bin
+```
 
 2. Abrir la consola de MYSQL y ejecutar los siguentes comandos para crear el usuario y otogar la replicacion a este.
 
@@ -55,7 +57,7 @@ Se implemento una replica en base al modelo MASTER-SLAVE (replica primaria) que 
 CREATE USER 'replication_user'@'10.43.100.141' IDENTIFIED BY 'password';
 GRANT REPLICATION SLAVE ON *.* TO 'replication_user'@'10.43.100.141';
 FLUSH PRIVILEGES;
-
+```
 
 - CREATE USER: Se coloca el nombre del usuario que queremos crear seguido de la direccion IP (se puedo colocar un nombre en lugar de la dirección IP si se quiere, este solo es un domnio).
 - IDENTIFIED BY: Se coloca la contraseña que se le quiere otorgar a este usuario que creamos.
@@ -64,14 +66,16 @@ FLUSH PRIVILEGES;
 
 ```sql
 SHOW MASTER STATUS \G
+```
 
 ## Configuracion del SLAVE
 
 4. Ir al archivo de configuración de MYSQL en el servidor SLAVE, en este caso se puede llamar my.cnf (para linux) o my.ini (para Windows). Debajo de la seccion de [mysqld] editar:
 
-
+```
 server-id = 2
 log-bin=mysql-bin
+```
 
 Es importante que el servir-id sea diferente al del MASTER
 
@@ -79,6 +83,7 @@ Es importante que el servir-id sea diferente al del MASTER
 
 ```sql
 CHANGE REPLICATION SOURCE TO SOURCE_HOST='10.43.100.136', SOURCE_USER='replication_user', SOURCE_PASSWORD='password', SOURCE_LOG_FILE='mysql-bin.000001', SOURCE_LOG_POS=905, SOURCE_SSL=1;
+```
 
 - SOURCE TO SOURCE_HOST: se coloca la dirección IP del servidor MASTER.
 - SOURCE_USER: usuario que se creo en el servidor MASTER.
@@ -91,6 +96,7 @@ CHANGE REPLICATION SOURCE TO SOURCE_HOST='10.43.100.136', SOURCE_USER='replicati
 
 ```sql
 START REPLICA USER='replication_user' PASSWORD='password';  
+```
 
 Aqui se coloca el usuario y el password que se crearon en el servidor MASTER.
 
@@ -98,6 +104,7 @@ Aqui se coloca el usuario y el password que se crearon en el servidor MASTER.
 
 ```sql
 SHOW REPLICA STATUS \G   
+```
 
 Si todo salio correctamente, deberia salir la siguiente informacion: waiting for source to send event
 
