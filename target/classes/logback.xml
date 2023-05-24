@@ -1,0 +1,40 @@
+<configuration>
+
+  <!-- If wanna log the logback status at the starup comment line below -->
+    <statusListener class="ch.qos.logback.core.status.NopStatusListener" />
+
+    <!-- Define el appender para la consola -->
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss} %highlight(%-5level){INFO=green, WARN=yellow, ERROR=red} %cyan(%logger{15}) - %m%n</pattern>
+        </encoder>
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>WARN</level>
+            <onMatch>ACCEPT</onMatch>
+        </filter>
+    </appender>
+
+    <!-- Define el appender para el archivo .log -->
+    <appender name="FILE" class="ch.qos.logback.core.FileAppender">
+        <file>logs/application.log</file>
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss} %-5p %c{1}:%L - %m%n</pattern>
+        </encoder>
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>WARN</level>
+            <onMatch>ACCEPT</onMatch>
+        </filter>
+    </appender>
+
+    <!-- Configura el logger para Hibernate -->
+    <logger name="org.hibernate" level="warn" additivity="false">
+        <appender-ref ref="CONSOLE" />
+        <appender-ref ref="FILE" />
+    </logger>
+
+    <!-- Define el nivel de log global para la aplicación -->
+    <root level="warn">
+        <appender-ref ref="CONSOLE" />
+        <appender-ref ref="FILE" />
+    </root>
+</configuration>
