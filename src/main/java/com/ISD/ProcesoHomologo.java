@@ -1,33 +1,41 @@
 package com.ISD;
 
 import org.zeromq.ZMQ;
+import org.zeromq.SocketType;
 import org.zeromq.ZContext;
+
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
 public class ProcesoHomologo{
 
-    private GC gestor;
-    
-    public GC getGestor() {
-        return gestor;
-    }
+    public void iniciar(GC gestor) throws InterruptedException
+    {
+        
+        ZContext context = new ZContext();
 
-    public void setGestor(GC gestor) {
-        this.gestor = gestor;
-    }
+        System.out.println("------------------INICIANDO GESTOR----------------");
+        // Vincular con el puerto de los procesos solicitantes
+        ZMQ.Socket socket = context.createSocket(SocketType.REP);
+        // puerto de los procesos solicitantes
+        // socket.bind("tcp://10.43.100.136:5555");
+        //puerto local 
+        socket.bind("tcp://10.43.100.136:5555");
 
-    public ProcesoHomologo(GC gestor) {
-        this.gestor = gestor;
-    }
+        // Vincular con un puerto para publicar los topicos
+        ZMQ.Socket publisher = context.createSocket(SocketType.PUB);
+        publisher.bind("tcp://10.43.100.136:5556");
+        
+        // Conexion con un puerto para la operacion de solicitar
+        ZMQ.Socket socketSolicitar = context.createSocket(SocketType.REQ);
+        socketSolicitar.connect("tcp://10.43.100.136:5557");
 
-    public void iniciarProcesoHomologo() {
-
-         // Inicio el gestor
-         try (ZContext context = new ZContext()){
-
-
+        // Inicio el gestor
+        try {
+            
+            System.out.println("entre aqui");
+            // Variables auxiliares para recibir valores
             String respuesta;
             String topico;
             
@@ -35,7 +43,7 @@ public class ProcesoHomologo{
             {   
                 System.out.println("entre while ..... ");
                 // Se recibe el mensaje del proceso solicitante
-                byte[] reply = this.gestor.getSocket().recv(0);
+                byte[] reply = socket.recv(0);
                 String solicitud = new String(reply, ZMQ.CHARSET); // Se genera un string con la solicitud con formato: accion, codigo                
                 
                 System.out.println("llego la solicitud: " + solicitud);
@@ -56,11 +64,11 @@ public class ProcesoHomologo{
                     
                     // Aceptar de forma inmediata la operacion y devolver una respusesta positva
                     System.out.println("Devolviendo respuesta al proceso solicitante...");
-                    this.gestor.getSocket().send(respuesta.getBytes(ZMQ.CHARSET), 0);
+                    socket.send(respuesta.getBytes(ZMQ.CHARSET), 0);
                     
                     // Publicar informacion del requerimiento
                     topico = "Devolucion";
-                    this.gestor.getPublisher().send(topico + " " + codigo); //Se envia: topico, codigo 
+                    publisher.send(topico + " " + codigo); //Se envia: topico, codigo 
                 }
                 else if(accion.equalsIgnoreCase("renovar")){
 
@@ -84,19 +92,19 @@ public class ProcesoHomologo{
                     
                     // Aceptar de forma inmediata la operacion y devolver una respusesta positva
                     System.out.println("Devolviendo respuesta al proceso solicitante...");
-                    this.gestor.getSocket().send(respuesta.getBytes(ZMQ.CHARSET), 0);
+                    socket.send(respuesta.getBytes(ZMQ.CHARSET), 0);
                     
                     // Publicar informacion del requerimiento
                     topico = "Renovacion";
-                    this.gestor.getPublisher().send(topico + " " + codigo + " " + fechaActual + " " + fechaEntrega); // Se envia: topico, codigo, fecha actual, fecha nueva de entrega 
+                    publisher.send(topico + " " + codigo + " " + fechaActual + " " + fechaEntrega); // Se envia: topico, codigo, fecha actual, fecha nueva de entrega 
                 }
                 else if(accion.equalsIgnoreCase("solicitar"))
                 {
                     // Asignarle el trabajo al ActorSolicitar
-                    this.gestor.getSocketSolicitar().send(solicitud.getBytes(ZMQ.CHARSET), 0);
+                    socketSolicitar.send(solicitud.getBytes(ZMQ.CHARSET), 0);
 
                     // Se obtiene la respuesta del actorSolicitar
-                    byte[] replySolicitar = this.gestor.getSocketSolicitar().recv(0);
+                    byte[] replySolicitar = socketSolicitar.recv(0);
                     System.out.println("Mensaje recibido del actor: " + new String(replySolicitar, ZMQ.CHARSET) + " desde la sede "+ sede);
                     
                     // Enviar la respuesta al proceso solicitante 
@@ -104,7 +112,7 @@ public class ProcesoHomologo{
                     System.out.println("////////////////////////////////////////////////////////////\n");
                     String respuestaSolicitante = new String(replySolicitar, ZMQ.CHARSET);
                     respuestaSolicitante = respuestaSolicitante + " desde la sede "+ sede +"\n";
-                    this.gestor.getSocket().send(respuestaSolicitante.getBytes(ZMQ.CHARSET), 0); // Se envia la respuesta al proceso solicitante
+                    socket.send(respuestaSolicitante.getBytes(ZMQ.CHARSET), 0); // Se envia la respuesta al proceso solicitante
                 }
                 else{
                     System.out.println("Operacion no soportada, las operaciones validas son: ");
@@ -118,29 +126,25 @@ public class ProcesoHomologo{
             }
 
         } catch (InterruptedException e) {
-            
-            System.out.println();
             System.out.println("\nFalla del gestor: ");
             e.printStackTrace();
-            System.out.println();
 
-            this.gestor.getContext().close();
-            this.gestor.getSocket().close();
-            this.gestor.getPublisher().close();
-            this.gestor.getSocketSolicitar().close();    
-           
+            socket.close();
+            publisher.close();
+            socketSolicitar.close();
+            context.close();
+            
+          
         }
         catch (org.zeromq.ZMQException e) {
-
-            System.out.println();
             System.err.println("\nFalla del gestor, excepción de ZeroMQ: " + e.getMessage());
-            e.printStackTrace();
-            System.out.println();
 
-            this.gestor.getContext().close();
-            this.gestor.getSocket().close();
-            this.gestor.getPublisher().close();
-            this.gestor.getSocketSolicitar().close();   
+            socket.close();
+            publisher.close();
+            socketSolicitar.close();
+            context.close();
         }
     }
+
+    
 }

@@ -35,7 +35,7 @@ public class ActorRenovar{
 
             // Conexion con un puerto para atender las publicaciones asociadas al topico
             ZMQ.Socket subscriber = context.createSocket(SocketType.SUB);
-            subscriber.connect("tcp://localhost:5556");
+            subscriber.connect("tcp://10.43.100.136:5556");
             subscriber.subscribe(getTopico().getBytes(ZMQ.CHARSET)); // Suscribirse al topico para recibir mensajes del publicador
             
             boolean actualizacion;

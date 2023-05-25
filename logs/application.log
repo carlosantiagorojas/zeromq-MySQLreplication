@@ -174,3 +174,5 @@ java.lang.IllegalStateException: Cannot get a connection as the driver manager i
 2023-05-24 17:56:43 WARN  o.h.o.c.pooling:75 - HHH10001002: Using Hibernate built-in connection pool (not for production use!)
 2023-05-24 18:00:00 WARN  o.h.o.c.pooling:75 - HHH10001002: Using Hibernate built-in connection pool (not for production use!)
 2023-05-24 18:01:38 WARN  o.h.o.c.pooling:75 - HHH10001002: Using Hibernate built-in connection pool (not for production use!)
+2023-05-24 20:56:21 WARN  o.h.o.c.pooling:75 - HHH10001002: Using Hibernate built-in connection pool (not for production use!)
+2023-05-24 22:17:44 WARN  o.h.o.c.pooling:75 - HHH10001002: Using Hibernate built-in connection pool (not for production use!)

@@ -15,7 +15,7 @@ public class ActorSolicitar{
             
             // Vincular con el puerto de los procesos solicitantes
             ZMQ.Socket socketSolicitar = context.createSocket(SocketType.REP);
-            socketSolicitar.bind("tcp://localhost:5557");
+            socketSolicitar.bind("tcp://10.43.100.136:5557");
 
             String respuestaGestor;
             boolean disponible;

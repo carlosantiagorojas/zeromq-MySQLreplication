@@ -6,6 +6,13 @@
     "configurations": [
         {
             "type": "java",
+            "name": "ProcesoHomologo",
+            "request": "launch",
+            "mainClass": "com.ISD.ProcesoHomologo",
+            "projectName": "zero-prueba"
+        },
+        {
+            "type": "java",
             "name": "ActorRenovar",
             "request": "launch",
             "mainClass": "com.ISD.ActorRenovar",

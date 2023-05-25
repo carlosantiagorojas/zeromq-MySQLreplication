@@ -6,6 +6,8 @@ import org.zeromq.ZContext;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class GCTest 
 {
@@ -18,36 +20,37 @@ public class GCTest
 
             System.out.println("------------------INICIANDO GESTOR----------------");
            
-            ZMQ.Socket socket = context.createSocket(SocketType.REP);
-            ZMQ.Socket publisher = context.createSocket(SocketType.PUB);
-            ZMQ.Socket socketSolicitar = context.createSocket(SocketType.REQ);
-            
             gestor.setContext(context);
+            
+            ZMQ.Socket socket = gestor.getContext().createSocket(SocketType.REP);
+            ZMQ.Socket publisher = gestor.getContext().createSocket(SocketType.PUB);
+            ZMQ.Socket socketSolicitar = gestor.getContext().createSocket(SocketType.REQ);
+
             gestor.setSocket(socket);
             gestor.setPublisher(publisher);
             gestor.setSocketSolicitar(socketSolicitar);
 
             // Vincular con el puerto de los procesos solicitantes
-             // puerto de los procesos solicitantes
+            // puerto de los procesos solicitantes (configurar sede 2)
             // socket.bind("tcp://10.43.100.136:5555");
             //puerto local 
-            gestor.getSocket().bind("tcp://localhost:5555");
+            gestor.getSocket().bind("tcp://10.43.100.136:5555");
             
             // Vincular con un puerto para publicar los topicos
-            gestor.getPublisher().bind("tcp://localhost:5556");
+            gestor.getPublisher().bind("tcp://10.43.100.136:5556");
 
             // Conexion con un puerto para la operacion de solicitar
-            gestor.getSocketSolicitar().connect("tcp://localhost:5557");
+            gestor.getSocketSolicitar().connect("tcp://10.43.100.136:5557");
     
-            final int TiempoT = 1500;
-            final ZContext contexta = gestor.getContext();
-            new java.util.Timer().schedule(new java.util.TimerTask() {
-                
+            final int TiempoT = 2000;
+            final ZContext cZContext = gestor.getContext();
+            Timer timer = new Timer();
+            timer.schedule(new TimerTask() {
                 @Override
-                public void run() {
-                    contexta.destroy(); // Utilizar la variable final adicional
+                public void run() {;
+                    cZContext.close();
                 }
-            }, TiempoT);    
+            }, TiempoT);   
             
             System.out.println("entre aqui");
             // Variables auxiliares para recibir valores
@@ -56,7 +59,6 @@ public class GCTest
             
             while (!Thread.currentThread().isInterrupted()) 
             {   
-                System.out.println("entre while ..... ");
                 // Se recibe el mensaje del proceso solicitante
                 byte[] reply = gestor.getSocket().recv(0);
                 String solicitud = new String(reply, ZMQ.CHARSET); // Se genera un string con la solicitud con formato: accion, codigo                
@@ -147,11 +149,21 @@ public class GCTest
             e.printStackTrace();
             System.out.println();
 
-            gestor.getContext().destroy();
+            gestor.getSocket().unbind("tcp://10.43.100.136:5555");
             gestor.getSocket().close();
+
+            gestor.getPublisher().unbind("tcp://10.43.100.136:5556");
             gestor.getPublisher().close();
-            gestor.getSocketSolicitar().close();    
-           
+
+            gestor.getSocketSolicitar().disconnect("tcp://10.43.100.136:5557");
+            gestor.getSocketSolicitar().close(); 
+
+            gestor.getContext().destroySocket(gestor.getSocket());
+            gestor.getContext().destroySocket(gestor.getPublisher());
+            gestor.getContext().destroySocket(gestor.getSocketSolicitar());
+
+            gestor.getContext().close();   
+            gestor.getContext().destroy();
         }
         catch (org.zeromq.ZMQException e) {
 
@@ -159,13 +171,13 @@ public class GCTest
             System.err.println("\nFalla del gestor, excepción de ZeroMQ: " + e.getMessage());
             e.printStackTrace();
             System.out.println();
+          
 
-            gestor.getContext().destroy();
             gestor.getSocket().close();
             gestor.getPublisher().close();
-            gestor.getSocketSolicitar().close();   
-            gestor.getSocket().close();
-            
+            gestor.getSocketSolicitar().close(); 
+            gestor.getContext().close();   
+
             procesoHomologo(gestor);
         }
     }
@@ -176,32 +188,13 @@ public class GCTest
         System.out.println("-------------------------------------------------------");
         System.out.println("--------------LEVANTANDO PROCESO HOMOLOGO--------------");
         System.out.println("-------------------------------------------------------\n");
-
-        ZContext context = new ZContext();
-
         
-        ZMQ.Socket socket = context.createSocket(SocketType.REP);
-        ZMQ.Socket publisher = context.createSocket(SocketType.PUB);
-        ZMQ.Socket socketSolicitar = context.createSocket(SocketType.REQ);
-        
-        gestor.setContext(context);
-        gestor.setSocket(socket);
-        gestor.setPublisher(publisher);
-        gestor.setSocketSolicitar(socketSolicitar);
-
-        // Vincular con el puerto de los procesos solicitantes
-        // puerto de los procesos solicitantes
-        // socket.bind("tcp://10.43.100.136:5555");
-        //puerto local 
-        gestor.getSocket().bind("tcp://localhost:5555");
-            
-        // Vincular con un puerto para publicar los topicos
-        gestor.getPublisher().bind("tcp://localhost:5556");
-
-        // Conexion con un puerto para la operacion de solicitar
-        gestor.getSocketSolicitar().connect("tcp://localhost:5557");
-
-        ProcesoHomologo procesoHomologo = new ProcesoHomologo(gestor);
-        procesoHomologo.iniciarProcesoHomologo();
+        ProcesoHomologo nuevoPros = new ProcesoHomologo();
+        try {
+            nuevoPros.iniciar(gestor);
+        } catch (InterruptedException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
     }
 }

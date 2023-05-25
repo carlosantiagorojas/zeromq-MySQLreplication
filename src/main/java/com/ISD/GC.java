@@ -10,6 +10,7 @@ public class GC{
     private ZMQ.Socket socket;
     private ZMQ.Socket publisher;
     private ZMQ.Socket socketSolicitar;
+    private ZMQ.Socket socketSolicitarPH;
 
     public GC()
     {
@@ -53,6 +54,14 @@ public class GC{
 
     public void setSocketSolicitar(ZMQ.Socket socketSolicitar) {
         this.socketSolicitar = socketSolicitar;
+    }
+
+    public ZMQ.Socket getSocketSolicitarPH() {
+        return socketSolicitarPH;
+    }
+
+    public void setSocketSolicitarPH(ZMQ.Socket socketSolicitarPH) {
+        this.socketSolicitarPH = socketSolicitarPH;
     }
 
    
