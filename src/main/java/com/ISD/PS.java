@@ -4,8 +4,6 @@ import java.util.HashMap;
 import org.zeromq.SocketType;
 import org.zeromq.ZMQ;
 import org.zeromq.ZContext;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Scanner;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -42,7 +40,6 @@ public class PS {
     
     public void inicio(String rutaArchivo)
     {
-        //List<PS> lista = new LinkedList<>();
         try {
 
             File file = new File(rutaArchivo);
@@ -61,7 +58,6 @@ public class PS {
                 PS procesoSolicitante = new PS(accion, codigo, sede);
 
                 procesoSolicitante.operacion(accion);
-                //lista.add(procesoSolicitante);
             }
             scanner.close();
         } catch (FileNotFoundException e) {
@@ -78,9 +74,9 @@ public class PS {
 
             // Dependiendo de la sede a la que va dirigido el requerimiento se conecta a esa seede
             if(getSede() == 1)
-                socket.connect("tcp://10.43.100.136:5555");
+                socket.connect("tcp://10.43.100.136:5555"); // sede 1
             else
-                //socket.connect("tcp://10.43.100.136:5555");
+                socket.connect("tcp://10.43.100.141:5555"); // sede 2
 
             // Se configura cuanto tiempo va a esperar por la respuesta antes de hacer el reintento
             socket.setReceiveTimeOut(5000);
@@ -119,9 +115,9 @@ public class PS {
                 socket = context.createSocket(SocketType.REQ);
 
                 if(getSede() == 1)
-                    socket.connect("tcp://10.43.100.136:5555"); // reconectar el socket
+                    socket.connect("tcp://10.43.100.136:5555"); // reconectar el socket de la sede 1
                 else
-                    //socket.connect("tcp://10.43.100.136:5555");
+                    socket.connect("tcp://10.43.100.141:5555"); // reconectar el socket de la sede 2
 
                 // Esperar un tiempo mientras se levanta el proceso homologo
                 try {

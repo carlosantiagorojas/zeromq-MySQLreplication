@@ -12,23 +12,43 @@ public class ProcesoHomologo{
 
     public void iniciar(GC gestor) throws InterruptedException
     {
-        // Inicio el gestor
-        try( ZContext context = new ZContext()) 
-        {
-            System.out.println();
-            System.out.println("------------------INICIANDO PROCESO HOMOLOGO SEDE 1----------------");
-            
-            // Vincular con el puerto local para recibir las request de procesos solicitantes
-            ZMQ.Socket socket = context.createSocket(SocketType.REP);
-            socket.bind("tcp://10.43.100.136:5555");
+       
+         // Inicio el gestor
+         try (ZContext context = new ZContext()){
 
+            System.out.println("------------------INICIANDO PROCESO HOMOLOGO SEDE 1----------------");
+           
+            gestor.setContext(context);
+            
+            ZMQ.Socket socket = gestor.getContext().createSocket(SocketType.REP);
+            ZMQ.Socket publisher = gestor.getContext().createSocket(SocketType.PUB);
+            ZMQ.Socket socketSolicitar = gestor.getContext().createSocket(SocketType.REQ);
+
+            gestor.setSocket(socket);
+            gestor.setPublisher(publisher);
+            gestor.setSocketSolicitar(socketSolicitar);
+
+            // Vincular con el puerto local para recibir las request de procesos solicitantes
+            gestor.getSocket().bind("tcp://10.43.100.136:5555");
+            
             // Vincular con un puerto para publicar los topicos
-            ZMQ.Socket publisher = context.createSocket(SocketType.PUB);
-            publisher.bind("tcp://10.43.100.136:5556");
-        
+            gestor.getPublisher().bind("tcp://10.43.100.136:5556");
+
             // Conexion con un puerto para la operacion de solicitar
-            ZMQ.Socket socketSolicitar = context.createSocket(SocketType.REQ);
-            socketSolicitar.connect("tcp://10.43.100.136:5557");
+            gestor.getSocketSolicitar().connect("tcp://10.43.100.136:5557");
+            
+            // Se fuerza a fallar el gestor despues de T tiempo de inicio (se configura en milisegundos)
+            /* 
+            final int TiempoT = 2000;
+            final ZContext cZContext = gestor.getContext();
+            Timer timer = new Timer();
+            timer.schedule(new TimerTask() {
+                @Override
+                public void run() {;
+                    cZContext.close();
+                }
+            }, TiempoT);
+            */
             
             // Variables auxiliares para recibir valores
             String respuesta;
@@ -37,15 +57,15 @@ public class ProcesoHomologo{
             while (!Thread.currentThread().isInterrupted()) 
             {   
                 // Se recibe el mensaje del proceso solicitante
-                byte[] reply = socket.recv(0);
+                byte[] reply = gestor.getSocket().recv(0);
                 String solicitud = new String(reply, ZMQ.CHARSET); // Se genera un string con la solicitud con formato: accion, codigo                
-            
+
                 // Se guarda la informacion de la solicitud
                 String[] elemSolicitud = solicitud.split(" ");
                 String accion = elemSolicitud[0];
                 int codigo = Integer.parseInt(elemSolicitud[1]);
                 int sede = Integer.parseInt(elemSolicitud[2]);
-
+                
                 // Informe de la solicitud
                 System.out.println("\n////////////////////////////////////////////////////////////");
                 System.out.println("Mensaje del proceso solicitante: operacion - " + accion + ", codigo - " + codigo + ", sede - " + sede);
@@ -58,11 +78,11 @@ public class ProcesoHomologo{
                     // Aceptar de forma inmediata la operacion y devolver una respusesta positva
                     System.out.println("Devolviendo respuesta al proceso solicitante...");
                     System.out.println("////////////////////////////////////////////////////////////\n");
-                    socket.send(respuesta.getBytes(ZMQ.CHARSET), 0);
+                    gestor.getSocket().send(respuesta.getBytes(ZMQ.CHARSET), 0);
                     
                     // Publicar informacion del requerimiento
                     topico = "Devolucion";
-                    publisher.send(topico + " " + codigo); //Se envia: topico, codigo 
+                    gestor.getPublisher().send(topico + " " + codigo); //Se envia: topico, codigo 
                 }
                 else if(accion.equalsIgnoreCase("renovar")){
 
@@ -87,27 +107,27 @@ public class ProcesoHomologo{
                     // Aceptar de forma inmediata la operacion y devolver una respusesta positva
                     System.out.println("Devolviendo respuesta al proceso solicitante...");
                     System.out.println("////////////////////////////////////////////////////////////\n");
-                    socket.send(respuesta.getBytes(ZMQ.CHARSET), 0);
+                    gestor.getSocket().send(respuesta.getBytes(ZMQ.CHARSET), 0);
                     
                     // Publicar informacion del requerimiento
                     topico = "Renovacion";
-                    publisher.send(topico + " " + codigo + " " + fechaActual + " " + fechaEntrega); // Se envia: topico, codigo, fecha actual, fecha nueva de entrega 
+                    gestor.getPublisher().send(topico + " " + codigo + " " + fechaActual + " " + fechaEntrega); // Se envia: topico, codigo, fecha actual, fecha nueva de entrega 
                 }
                 else if(accion.equalsIgnoreCase("solicitar"))
                 {
                     // Asignarle el trabajo al ActorSolicitar
-                    socketSolicitar.send(solicitud.getBytes(ZMQ.CHARSET), 0);
+                    gestor.getSocketSolicitar().send(solicitud.getBytes(ZMQ.CHARSET), 0);
 
                     // Se obtiene la respuesta del actorSolicitar
-                    byte[] replySolicitar = socketSolicitar.recv(0);
-                    System.out.println("Mensaje recibido del actor: " + new String(replySolicitar, ZMQ.CHARSET) + " desde la sede "+ sede);
+                    byte[] replySolicitar = gestor.getSocketSolicitar().recv(0);
+                    System.out.println("Mensaje recibido del actor: " + new String(replySolicitar, ZMQ.CHARSET));
                     
                     // Enviar la respuesta al proceso solicitante 
                     System.out.println("Devolviendo respuesta al proceso solicitante...");
                     System.out.println("////////////////////////////////////////////////////////////\n");
                     String respuestaSolicitante = new String(replySolicitar, ZMQ.CHARSET);
                     respuestaSolicitante = respuestaSolicitante + " desde la sede "+ sede +"\n";
-                    socket.send(respuestaSolicitante.getBytes(ZMQ.CHARSET), 0); // Se envia la respuesta al proceso solicitante
+                    gestor.getSocket().send(respuestaSolicitante.getBytes(ZMQ.CHARSET), 0); // Se envia la respuesta al proceso solicitante
                 }
                 else{
                     System.out.println("Operacion no soportada, las operaciones validas son: ");
@@ -116,37 +136,38 @@ public class ProcesoHomologo{
                     System.out.println("solicitar,<codigo del libro>,<numero de la sede>");
                 }
                 
-                 // Configurar el tiempo de espera
                 Thread.sleep(1000); // Tiempo de espera para hacer el trabajo 
             }
 
         } catch (InterruptedException e) {
-
+            
             // Se informa la falla del gestor
             System.out.println();
             System.out.println("\nFalla del gestor: ");
             e.printStackTrace();
             System.out.println();
- 
+
             // Se cierran los sockets y el contexto para liberar recursos
             gestor.getSocket().close();
             gestor.getPublisher().close();
             gestor.getSocketSolicitar().close(); 
             gestor.getContext().close();  
+
         }
         catch (org.zeromq.ZMQException e) {
 
-           // Se informa la falla del gestor
-           System.out.println();
-           System.err.println("\nFalla del gestor, excepción de ZeroMQ: " + e.getMessage());
-           e.printStackTrace();
-           System.out.println();
-         
-           // Se cierran los sockets y el contexto para liberar recursos
-           gestor.getSocket().close();
-           gestor.getPublisher().close();
-           gestor.getSocketSolicitar().close(); 
-           gestor.getContext().close();   
+            // Se informa la falla del gestor
+            System.out.println();
+            System.err.println("\nFalla del gestor, excepción de ZeroMQ: " + e.getMessage());
+            e.printStackTrace();
+            System.out.println();
+          
+            // Se cierran los sockets y el contexto para liberar recursos
+            gestor.getSocket().close();
+            gestor.getPublisher().close();
+            gestor.getSocketSolicitar().close(); 
+            gestor.getContext().close();   
+
         }
     }
 

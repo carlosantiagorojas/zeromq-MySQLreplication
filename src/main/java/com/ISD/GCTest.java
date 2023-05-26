@@ -40,7 +40,8 @@ public class GCTest
             gestor.getSocketSolicitar().connect("tcp://10.43.100.136:5557");
             
             // Se fuerza a fallar el gestor despues de T tiempo de inicio (se configura en milisegundos)
-            final int TiempoT = 2000;
+
+            final int TiempoT = 10000;
             final ZContext cZContext = gestor.getContext();
             Timer timer = new Timer();
             timer.schedule(new TimerTask() {
@@ -49,6 +50,7 @@ public class GCTest
                     cZContext.close();
                 }
             }, TiempoT);
+            
             
             // Variables auxiliares para recibir valores
             String respuesta;
@@ -120,7 +122,7 @@ public class GCTest
 
                     // Se obtiene la respuesta del actorSolicitar
                     byte[] replySolicitar = gestor.getSocketSolicitar().recv(0);
-                    System.out.println("Mensaje recibido del actor: " + new String(replySolicitar, ZMQ.CHARSET) + " desde la sede "+ sede);
+                    System.out.println("Mensaje recibido del actor: " + new String(replySolicitar, ZMQ.CHARSET));
                     
                     // Enviar la respuesta al proceso solicitante 
                     System.out.println("Devolviendo respuesta al proceso solicitante...");

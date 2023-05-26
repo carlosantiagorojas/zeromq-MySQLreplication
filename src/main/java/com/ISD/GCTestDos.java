@@ -29,14 +29,14 @@ public class GCTestDos {
             gestor.setSocketSolicitarPH(socketReenviar);
 
             // Vincular con el puerto local para recibir las request de procesos solicitantes
-            //gestor.getSocket().bind("tcp://10.43.100.136:5555");
+            gestor.getSocket().bind("tcp://10.43.100.141:5555");
             
             //Conexion con un puerto para reenviar los mensajes a la sede 1
             gestor.getSocketSolicitarPH().connect("tcp://10.43.100.136:5555");
 
             // Se configura cuanto tiempo va a esperar por la respuesta antes de hacer el reintento
             gestor.getSocketSolicitarPH().setReceiveTimeOut(5000);
-            
+
             // Se fuerza a fallar el gestor despues de T tiempo de inicio (se configura en milisegundos)
             /*
             final int TiempoT = 2000;
@@ -49,10 +49,11 @@ public class GCTestDos {
                 }
             }, TiempoT);
             */
-            
+           
             while (!Thread.currentThread().isInterrupted()) 
             {   
                 // Se recibe el mensaje del proceso solicitante
+               
                 byte[] reply = gestor.getSocket().recv(0);
                 String solicitud = new String(reply, ZMQ.CHARSET); // Se genera un string con la solicitud con formato: accion, codigo                
 
@@ -65,23 +66,23 @@ public class GCTestDos {
                 // Informe de la solicitud
                 System.out.println("\n////////////////////////////////////////////////////////////");
                 System.out.println("Mensaje del proceso solicitante: operacion - " + accion + ", codigo - " + codigo + ", sede - " + sede);
-
+    
                 // Dependiendo de la solicitud se realizara una accion
                 if(accion.equalsIgnoreCase("devolver") || accion.equalsIgnoreCase("renovar") || accion.equalsIgnoreCase("solicitar") ){
                     
-                    // Asignarle el trabajo al gestor de la sede 1
+                    // enviar mensaje para designarle el trabajo al gestor de la sede 1
                     gestor.getSocketSolicitarPH().send(solicitud.getBytes(ZMQ.CHARSET), 0);
 
                     // Se obtiene la respuesta del actorSolicitar
                     byte[] replySolicitar = gestor.getSocketSolicitarPH().recv(0);
-                    if (reply == null) {
+                    if (replySolicitar == null) {
 
                         // Si no se recibe la respuesta
                         System.out.println("No se recibió respuesta del gestor de la sede 1");
                         socket.close(); // cerrar el socket antes de reconectarlo
                         socket = context.createSocket(SocketType.REQ);
         
-                        //socket.connect("tcp://10.43.100.136:5555"); // reconectar el socket
+                        socket.connect("tcp://10.43.100.136:5555"); // reconectar el socket
   
                         // Esperar un tiempo mientras se levanta el proceso homologo
                         try {
@@ -91,21 +92,21 @@ public class GCTestDos {
                         }
                         
                         // Reenviar la solicitud
-                        if(socket.send(solicitud.getBytes(ZMQ.CHARSET), 0))
+                        if(socket.send(solicitud.getBytes(ZMQ.CHARSET), 0)){
                             System.out.println("Reenviando solicitud...");
+                        }
                         else
                             System.out.println("No se pudo reenviar la solicitud");   
         
                     } else {
 
                         // Se obtiene la respuesta del gestor
-                        System.out.println("\nMensaje recibido del gestor de la sede 1: " + new String(reply, ZMQ.CHARSET));
+                        System.out.println("\nMensaje recibido del gestor de la sede 1: " + new String(replySolicitar, ZMQ.CHARSET));
                         
                         // Enviar la respuesta al proceso solicitante 
                         System.out.println("Devolviendo respuesta al proceso solicitante...");
                         System.out.println("////////////////////////////////////////////////////////////\n");
                         String respuestaSolicitante = new String(replySolicitar, ZMQ.CHARSET);
-                        respuestaSolicitante = respuestaSolicitante + " desde la sede "+ sede +"\n";
                         gestor.getSocket().send(respuestaSolicitante.getBytes(ZMQ.CHARSET), 0); // Se envia la respuesta al proceso solicitante
                         }
                    }
@@ -129,8 +130,6 @@ public class GCTestDos {
 
             // Se cierran los sockets y el contexto para liberar recursos
             gestor.getSocket().close();
-            gestor.getPublisher().close();
-            gestor.getSocketSolicitar().close(); 
             gestor.getContext().close();  
             
             //Se levanta el proceso homologo
@@ -146,9 +145,7 @@ public class GCTestDos {
             System.out.println();
           
             // Se cierran los sockets y el contexto para liberar recursos
-            gestor.getSocket().close();
-            gestor.getPublisher().close();
-            gestor.getSocketSolicitar().close(); 
+            gestor.getSocket().close(); 
             gestor.getContext().close();   
 
             //Se levanta el proceso homologo
