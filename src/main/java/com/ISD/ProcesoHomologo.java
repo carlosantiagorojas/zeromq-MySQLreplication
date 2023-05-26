@@ -16,7 +16,7 @@ public class ProcesoHomologo{
         try( ZContext context = new ZContext()) 
         {
             System.out.println();
-            System.out.println("------------------INICIANDO PROCESO HOMOLOGO----------------");
+            System.out.println("------------------INICIANDO PROCESO HOMOLOGO SEDE 1----------------");
             
             // Vincular con el puerto local para recibir las request de procesos solicitantes
             ZMQ.Socket socket = context.createSocket(SocketType.REP);
@@ -57,6 +57,7 @@ public class ProcesoHomologo{
                     
                     // Aceptar de forma inmediata la operacion y devolver una respusesta positva
                     System.out.println("Devolviendo respuesta al proceso solicitante...");
+                    System.out.println("////////////////////////////////////////////////////////////\n");
                     socket.send(respuesta.getBytes(ZMQ.CHARSET), 0);
                     
                     // Publicar informacion del requerimiento
@@ -85,6 +86,7 @@ public class ProcesoHomologo{
                     
                     // Aceptar de forma inmediata la operacion y devolver una respusesta positva
                     System.out.println("Devolviendo respuesta al proceso solicitante...");
+                    System.out.println("////////////////////////////////////////////////////////////\n");
                     socket.send(respuesta.getBytes(ZMQ.CHARSET), 0);
                     
                     // Publicar informacion del requerimiento

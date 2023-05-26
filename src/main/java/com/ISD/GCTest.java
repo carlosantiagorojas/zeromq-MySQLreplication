@@ -18,7 +18,7 @@ public class GCTest
          // Inicio el gestor
          try (ZContext context = new ZContext()){
 
-            System.out.println("------------------INICIANDO GESTOR----------------");
+            System.out.println("------------------INICIANDO GESTOR SEDE 1----------------");
            
             gestor.setContext(context);
             
@@ -77,6 +77,7 @@ public class GCTest
                     
                     // Aceptar de forma inmediata la operacion y devolver una respusesta positva
                     System.out.println("Devolviendo respuesta al proceso solicitante...");
+                    System.out.println("////////////////////////////////////////////////////////////\n");
                     gestor.getSocket().send(respuesta.getBytes(ZMQ.CHARSET), 0);
                     
                     // Publicar informacion del requerimiento
@@ -105,6 +106,7 @@ public class GCTest
                     
                     // Aceptar de forma inmediata la operacion y devolver una respusesta positva
                     System.out.println("Devolviendo respuesta al proceso solicitante...");
+                    System.out.println("////////////////////////////////////////////////////////////\n");
                     gestor.getSocket().send(respuesta.getBytes(ZMQ.CHARSET), 0);
                     
                     // Publicar informacion del requerimiento

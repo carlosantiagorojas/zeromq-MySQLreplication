@@ -62,8 +62,6 @@ public class GC{
 
     public void setSocketSolicitarPH(ZMQ.Socket socketSolicitarPH) {
         this.socketSolicitarPH = socketSolicitarPH;
-    }
-
-   
+    }   
 }
 

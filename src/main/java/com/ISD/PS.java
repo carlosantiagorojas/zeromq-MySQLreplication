@@ -42,7 +42,7 @@ public class PS {
     
     public void inicio(String rutaArchivo)
     {
-        List<PS> lista = new LinkedList<>();
+        //List<PS> lista = new LinkedList<>();
         try {
 
             File file = new File(rutaArchivo);
@@ -61,7 +61,7 @@ public class PS {
                 PS procesoSolicitante = new PS(accion, codigo, sede);
 
                 procesoSolicitante.operacion(accion);
-                lista.add(procesoSolicitante);
+                //lista.add(procesoSolicitante);
             }
             scanner.close();
         } catch (FileNotFoundException e) {
@@ -75,7 +75,12 @@ public class PS {
 
             // Conexion con un puerto para enviar la solcitud al gestor de carga
             ZMQ.Socket socket = context.createSocket(SocketType.REQ);
-            socket.connect("tcp://10.43.100.136:5555");
+
+            // Dependiendo de la sede a la que va dirigido el requerimiento se conecta a esa seede
+            if(getSede() == 1)
+                socket.connect("tcp://10.43.100.136:5555");
+            else
+                //socket.connect("tcp://10.43.100.136:5555");
 
             // Se configura cuanto tiempo va a esperar por la respuesta antes de hacer el reintento
             socket.setReceiveTimeOut(5000);
@@ -112,7 +117,11 @@ public class PS {
                 System.out.println("No se recibió respuesta del gestor");
                 socket.close(); // cerrar el socket antes de reconectarlo
                 socket = context.createSocket(SocketType.REQ);
-                socket.connect("tcp://10.43.100.136:5555"); // reconectar el socket
+
+                if(getSede() == 1)
+                    socket.connect("tcp://10.43.100.136:5555"); // reconectar el socket
+                else
+                    //socket.connect("tcp://10.43.100.136:5555");
 
                 // Esperar un tiempo mientras se levanta el proceso homologo
                 try {
