@@ -26,7 +26,7 @@ public class ActorRenovar{
         ActorRenovar.topico = topico;
     }
 
-    public static void main(String[] args) throws Exception {
+    public void iniciar() throws Exception {
         
          // Suscribir el actor por default al topico Renovacion
          setTopico("Renovacion");

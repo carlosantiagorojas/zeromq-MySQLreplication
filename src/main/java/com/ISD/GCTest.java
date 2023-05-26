@@ -11,7 +11,7 @@ import java.util.TimerTask;
 
 public class GCTest 
 {
-    public static void main(String[] args) throws Exception {
+    public void iniciar() throws Exception {
 
         GC gestor = new GC();
         
@@ -41,7 +41,7 @@ public class GCTest
             
             // Se fuerza a fallar el gestor despues de T tiempo de inicio (se configura en milisegundos)
 
-            final int TiempoT = 10000;
+            final int TiempoT = 1000;
             final ZContext cZContext = gestor.getContext();
             Timer timer = new Timer();
             timer.schedule(new TimerTask() {

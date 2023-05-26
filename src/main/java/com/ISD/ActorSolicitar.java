@@ -9,7 +9,7 @@ public class ActorSolicitar{
     public ActorSolicitar() {
     }
 
-    public static void main(String[] args) throws Exception {
+    public void iniciar() throws Exception {
 
         try (ZContext context = new ZContext()) {
             

@@ -11,7 +11,7 @@ import java.util.TimerTask;
 
 public class GCTestDos {
     
-    public static void main(String[] args) throws Exception {
+    public void iniciar() throws Exception {
 
         GC gestor = new GC();
         
