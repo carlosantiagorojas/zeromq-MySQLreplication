@@ -29,8 +29,11 @@ public class FuncionesLibro{
         Prestamos prestamo = EnMan.find(Prestamos.class, id);
 
         if (prestamo == null) {
-            //System.out.println("Informe....");
-            //System.out.println("El prestamo con codigo " + id + " que quiere devolver no se encuentra prestado");
+
+            System.out.println();
+            System.out.println("Informe....");
+            System.out.println("El prestamo con codigo " + id + " que quiere devolver no se encuentra prestado");
+            System.out.println();
             //EnMan.close();
             //EnManFac.close();
             return false;
@@ -62,8 +65,11 @@ public class FuncionesLibro{
             
                 Libro libro = EnMan.find(Libro.class, ISBN);
                 if(libro.getCantidad() < 1)
-                {
-                    //System.out.println("No quedan mas ejemplares del libro con codigo "+ ISBN +" que solicito");
+                {      
+                    System.out.println();
+                    System.out.println("Informe....");
+                    System.out.println("No quedan mas ejemplares del libro con codigo "+ ISBN +" que solicito");
+                    System.out.println();
                     //EnMan.close();
                     //EnManFac.close();
                     return false;

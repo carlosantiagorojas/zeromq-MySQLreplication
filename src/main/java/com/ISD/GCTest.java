@@ -30,10 +30,7 @@ public class GCTest
             gestor.setPublisher(publisher);
             gestor.setSocketSolicitar(socketSolicitar);
 
-            // Vincular con el puerto de los procesos solicitantes
-            // puerto de los procesos solicitantes (configurar sede 2)
-            // socket.bind("tcp://10.43.100.136:5555");
-            //puerto local 
+            // Vincular con el puerto local para recibir las request de procesos solicitantes
             gestor.getSocket().bind("tcp://10.43.100.136:5555");
             
             // Vincular con un puerto para publicar los topicos
@@ -41,7 +38,8 @@ public class GCTest
 
             // Conexion con un puerto para la operacion de solicitar
             gestor.getSocketSolicitar().connect("tcp://10.43.100.136:5557");
-    
+            
+            // Se fuerza a fallar el gestor despues de T tiempo de inicio (se configura en milisegundos)
             final int TiempoT = 2000;
             final ZContext cZContext = gestor.getContext();
             Timer timer = new Timer();
@@ -50,9 +48,8 @@ public class GCTest
                 public void run() {;
                     cZContext.close();
                 }
-            }, TiempoT);   
+            }, TiempoT);
             
-            System.out.println("entre aqui");
             // Variables auxiliares para recibir valores
             String respuesta;
             String topico;
@@ -62,15 +59,14 @@ public class GCTest
                 // Se recibe el mensaje del proceso solicitante
                 byte[] reply = gestor.getSocket().recv(0);
                 String solicitud = new String(reply, ZMQ.CHARSET); // Se genera un string con la solicitud con formato: accion, codigo                
-                
-                System.out.println("llego la solicitud: " + solicitud);
 
                 // Se guarda la informacion de la solicitud
                 String[] elemSolicitud = solicitud.split(" ");
                 String accion = elemSolicitud[0];
                 int codigo = Integer.parseInt(elemSolicitud[1]);
                 int sede = Integer.parseInt(elemSolicitud[2]);
-
+                
+                // Informe de la solicitud
                 System.out.println("\n////////////////////////////////////////////////////////////");
                 System.out.println("Mensaje del proceso solicitante: operacion - " + accion + ", codigo - " + codigo + ", sede - " + sede);
 
@@ -138,46 +134,42 @@ public class GCTest
                     System.out.println("solicitar,<codigo del libro>,<numero de la sede>");
                 }
                 
-                 // Configurar el tiempo de espera
                 Thread.sleep(1000); // Tiempo de espera para hacer el trabajo 
             }
 
         } catch (InterruptedException e) {
             
+            // Se informa la falla del gestor
             System.out.println();
             System.out.println("\nFalla del gestor: ");
             e.printStackTrace();
             System.out.println();
 
-            gestor.getSocket().unbind("tcp://10.43.100.136:5555");
+            // Se cierran los sockets y el contexto para liberar recursos
             gestor.getSocket().close();
-
-            gestor.getPublisher().unbind("tcp://10.43.100.136:5556");
             gestor.getPublisher().close();
-
-            gestor.getSocketSolicitar().disconnect("tcp://10.43.100.136:5557");
             gestor.getSocketSolicitar().close(); 
+            gestor.getContext().close();  
+            
+            //Se levanta el proceso homologo
+            procesoHomologo(gestor);
 
-            gestor.getContext().destroySocket(gestor.getSocket());
-            gestor.getContext().destroySocket(gestor.getPublisher());
-            gestor.getContext().destroySocket(gestor.getSocketSolicitar());
-
-            gestor.getContext().close();   
-            gestor.getContext().destroy();
         }
         catch (org.zeromq.ZMQException e) {
 
+            // Se informa la falla del gestor
             System.out.println();
             System.err.println("\nFalla del gestor, excepción de ZeroMQ: " + e.getMessage());
             e.printStackTrace();
             System.out.println();
           
-
+            // Se cierran los sockets y el contexto para liberar recursos
             gestor.getSocket().close();
             gestor.getPublisher().close();
             gestor.getSocketSolicitar().close(); 
             gestor.getContext().close();   
 
+            //Se levanta el proceso homologo
             procesoHomologo(gestor);
         }
     }
@@ -189,11 +181,12 @@ public class GCTest
         System.out.println("--------------LEVANTANDO PROCESO HOMOLOGO--------------");
         System.out.println("-------------------------------------------------------\n");
         
+        //Se crea el nuevo proceso homologo
         ProcesoHomologo nuevoPros = new ProcesoHomologo();
         try {
             nuevoPros.iniciar(gestor);
         } catch (InterruptedException e) {
-            // TODO Auto-generated catch block
+            System.err.println("\nFalla del proceso homologo, " + e.getMessage());
             e.printStackTrace();
         }
     }

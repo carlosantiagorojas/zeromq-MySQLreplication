@@ -42,17 +42,16 @@ public class ActorSolicitar{
                 disponible = FuncionesLibro.OperacionSolicitar(codigo);
 
                 // Informar si se actualizo la base de datos
-
                 if(disponible == true)
                 {
-                    respuestaGestor = "El libro SI esta disponible con codigo " + codigo;
+                    respuestaGestor = "El libro con codigo " + codigo + " se solicito exitosamente";
                     socketSolicitar.send(respuestaGestor.getBytes(ZMQ.CHARSET), 0);
                     System.out.println("-----------------------------------------------------------");
                     System.out.println("El libro con codigo " + codigo + " se solicito exitosamente!");
                     System.out.println("-----------------------------------------------------------\n");
                 }
                 else{
-                    respuestaGestor = "El libro NO esta disponible con codigo " + codigo;
+                    respuestaGestor = "El libro con codigo " + codigo + " no se pudo solicitar";
                     socketSolicitar.send(respuestaGestor.getBytes(ZMQ.CHARSET), 0);
                     System.out.println("-----------------------------------------------------------");
                     System.out.println("No se pudo solicitar el libro con codigo " + codigo);

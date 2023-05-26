@@ -75,8 +75,9 @@ public class PS {
 
             // Conexion con un puerto para enviar la solcitud al gestor de carga
             ZMQ.Socket socket = context.createSocket(SocketType.REQ);
-            //socket.connect("tcp://10.43.100.141:5555");
             socket.connect("tcp://10.43.100.136:5555");
+
+            // Se configura cuanto tiempo va a esperar por la respuesta antes de hacer el reintento
             socket.setReceiveTimeOut(5000);
 
             // Se obtiene el codigo de acuerdo a la operacion
@@ -103,16 +104,29 @@ public class PS {
                 socket.send(request.getBytes(ZMQ.CHARSET), 0); // Se envia la solcitud
             }
 
-             // Check for a response
+            // Recibar por alguna respuesta
             byte[] reply = socket.recv(0);
             if (reply == null) {
-                // No response received, resend the request
-                System.out.println("No se recibió respuesta, reenviando solicitud...");
-                socket.disconnect("tcp://10.43.100.136:5555");
-                socket.close(); // Close the socket before reconnecting
+
+                // Si no se recibe la respuesta
+                System.out.println("No se recibió respuesta del gestor");
+                socket.close(); // cerrar el socket antes de reconectarlo
                 socket = context.createSocket(SocketType.REQ);
-                socket.connect("tcp://10.43.100.136:5558");
-                socket.send(request.getBytes(ZMQ.CHARSET), 0);
+                socket.connect("tcp://10.43.100.136:5555"); // reconectar el socket
+
+                // Esperar un tiempo mientras se levanta el proceso homologo
+                try {
+                    Thread.sleep(500);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                
+                // Reenviar la solicitud
+                if(socket.send(request.getBytes(ZMQ.CHARSET), 0))
+                    System.out.println("Reenviando solicitud...");
+                else
+                    System.out.println("No se pudo reenviar la solicitud");   
+
             } else {
                 // Se obtiene la respuesta del gesto
                 System.out.println("\nMensaje recibido del gestor: " + new String(reply, ZMQ.CHARSET));

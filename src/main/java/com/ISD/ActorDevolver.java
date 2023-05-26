@@ -38,8 +38,10 @@ public class ActorDevolver {
             // Leer las publicacion que va colocando el publicador
             while (!Thread.currentThread().isInterrupted())
             {
+                // Se recibe el mensaje publicado por el gestor de carga
                 String respuesta = subscriber.recvStr();
                 
+                // Guardar la informacion de la solicitud
                 String [] elem = respuesta.split(" ");
                 String topico = elem[0];
                 int codigo = Integer.parseInt(elem[1]);
@@ -57,12 +59,12 @@ public class ActorDevolver {
                 // Informar si se actualizo la base de datos
                 if(actualizacion == true){
                     System.out.println("-----------------------------------------------------------");
-                    System.out.println("El libro con codigo " + codigo + " se devolvio exitosamente!");
+                    System.out.println("El prestamo con codigo " + codigo + " se devolvio exitosamente!");
                     System.out.println("-----------------------------------------------------------\n");
                 }
                 else{
                     System.out.println("-----------------------------------------------------------");
-                    System.out.println("No se pudo devolver el libro con codigo " + codigo);
+                    System.out.println("No se pudo devolver el prestamo con codigo " + codigo);
                     System.out.println("-----------------------------------------------------------\n");
                 } 
             }

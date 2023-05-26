@@ -22,8 +22,10 @@ public class FuncionesPrestamos{
         Prestamos prestamo = EnMan.find(Prestamos.class, id);
 
         if (prestamo == null) {
+            System.out.println();
             System.out.println("Informe....");
             System.out.println("El prestamo con codigo " + id + " que quiere renovar no se encuentra prestado");
+            System.out.println();
             //EnMan.close();
             //EnManFac.close();
 
@@ -47,7 +49,10 @@ public class FuncionesPrestamos{
 
         if (prestamo == null) {
 
-            //System.out.println("El prestamo con codigo " + id + " que quiere devolver no se encuentra prestado");
+            System.out.println();
+            System.out.println("Informe....");
+            System.out.println("El prestamo con codigo " + id + " que quiere devolver no se encuentra prestado");
+            System.out.println();
             //EnMan.close();
             //EnManFac.close();
 
@@ -78,7 +83,7 @@ public class FuncionesPrestamos{
 
         }while(prestamo != null);
 
-        
+        // Generar la nueva fecha
         Calendar c = Calendar.getInstance();
         c.setTime(new Date());
         c.add(Calendar.DATE, 7);
