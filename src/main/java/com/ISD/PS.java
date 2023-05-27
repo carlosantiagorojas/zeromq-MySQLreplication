@@ -44,7 +44,7 @@ public class PS {
 
             File file = new File(rutaArchivo);
             Scanner scanner = new Scanner(file);
-            //Se lee la linea del archivo 
+            // Se lee la linea del archivo 
             while (scanner.hasNextLine()) {
                 String linea = scanner.nextLine();
                 String[] elementos = linea.split(",");
@@ -105,7 +105,7 @@ public class PS {
                 socket.send(request.getBytes(ZMQ.CHARSET), 0); // Se envia la solcitud
             }
 
-            // Recibar por alguna respuesta
+            // Esperar por alguna respuesta
             byte[] reply = socket.recv(0);
             if (reply == null) {
 
