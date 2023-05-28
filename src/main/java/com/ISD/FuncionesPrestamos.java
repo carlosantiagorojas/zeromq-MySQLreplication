@@ -16,8 +16,6 @@ public class FuncionesPrestamos{
 
 
     public static boolean OperacionRenovacion(int id, Date fecha) {
-        
-        EnMan.getTransaction().begin();
 
         Prestamos prestamo = EnMan.find(Prestamos.class, id);
 
@@ -33,6 +31,8 @@ public class FuncionesPrestamos{
         }
 
         prestamo.setFechaRenovacion(fecha);
+
+        EnMan.getTransaction().begin();
         EnMan.merge(prestamo);
         EnMan.getTransaction().commit();
         //EnMan.close();
@@ -42,8 +42,6 @@ public class FuncionesPrestamos{
     }
 
     public static boolean EliminarPrestamo(int id) {
-
-        EnMan.getTransaction().begin();
 
         Prestamos prestamo = EnMan.find(Prestamos.class, id);
 
@@ -59,6 +57,7 @@ public class FuncionesPrestamos{
             return false;
         }
 
+        EnMan.getTransaction().begin();
         EnMan.remove(prestamo);
         EnMan.getTransaction().commit();
         //EnMan.close();
