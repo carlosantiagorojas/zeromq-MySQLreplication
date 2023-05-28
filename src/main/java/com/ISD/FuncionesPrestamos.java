@@ -70,37 +70,40 @@ public class FuncionesPrestamos{
 
     public static boolean CrearPrestamo(int libro_ISBN) throws SQLIntegrityConstraintViolationException {
         
-        
-        Prestamos prestamo; 
-        int numeroAleatorio;
-        
-        // Crear un id aleatorio que no este repetido
-        do
+        Libro libro = EnMan.find(Libro.class, libro_ISBN);
+        if(libro != null)
         {
-            Random rand = new Random();
-            numeroAleatorio = rand.nextInt(300) + 1;
-            prestamo = EnMan.find(Prestamos.class, numeroAleatorio);
+            Prestamos prestamo; 
+            int numeroAleatorio;
+        
+            // Crear un id aleatorio que no este repetido
+            do
+            {
+                Random rand = new Random();
+                numeroAleatorio = rand.nextInt(300) + 1;
+                prestamo = EnMan.find(Prestamos.class, numeroAleatorio);
 
-        }while(prestamo != null);
+            }while(prestamo != null);
 
-        // Generar la nueva fecha
-        Calendar c = Calendar.getInstance();
-        c.setTime(new Date());
-        c.add(Calendar.DATE, 7);
-        Date fechaNueva = c.getTime();
+            // Generar la nueva fecha
+            Calendar c = Calendar.getInstance();
+            c.setTime(new Date());
+            c.add(Calendar.DATE, 7);
+            Date fechaNueva = c.getTime();
 
-        prestamo = new Prestamos(numeroAleatorio, fechaNueva, libro_ISBN, 1);
-       
-        EnMan.getTransaction().begin();
-        EnMan.persist(prestamo);
-        EnMan.getTransaction().commit();
+            prestamo = new Prestamos(numeroAleatorio, fechaNueva, libro_ISBN, 1);
+            
+            EnMan.getTransaction().begin();
+            EnMan.persist(prestamo);
+            EnMan.getTransaction().commit();
 
-        //EnMan.close();
-        //EnManFac.close();
-
-        return true;
+            //EnMan.close();
+            //EnManFac.close();
+            return true;
+        }
+        else
+            return false;
+    
     }
-
-
 
 }

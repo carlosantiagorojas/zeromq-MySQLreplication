@@ -88,6 +88,11 @@ public class FuncionesLibro{
                 }
 
             }
+            else{
+                System.out.println("Informe....");
+                System.out.println("No existe el libro con codigo "+ ISBN +" que solicito");
+                return false;
+            }
         } catch (SQLIntegrityConstraintViolationException e) {
             e.printStackTrace();
         }
