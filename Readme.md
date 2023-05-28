@@ -125,4 +125,4 @@ Para poder ejecutar el proyecto tiene que modificar el archivo de "requermientos
 -codigo: si el tipo de requerimiento es solicitar se coloca el codigo del libro, de lo contrario el codigo el prestamo
 -numero de sede: numero de la sede al cual se le envian los requerimientos (1 o 2)
 
-Posteriormente se debe ejecutar los actores de la sede 1 (clases: ActorDevolver, ActorRenovar, ActorSolicitar), los gestores de ambas sedes (clases: GCTest, GCTestDos) y los proceso solicitantes en el otro computador(clase: PSTest). 
+Posteriormente se debe ejecutar los actores de la sede 1 (clases: ExecuteActorDevolver, ExecuteActorRenovar, ExecuteActorSolicitar), los gestores de ambas sedes (clases: ExecuteGCTest, ExecuteGCTestDos) y los proceso solicitantes en el otro computador(clase: PSTest). 
