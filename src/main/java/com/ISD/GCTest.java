@@ -40,8 +40,8 @@ public class GCTest
             gestor.getSocketSolicitar().connect("tcp://10.43.100.136:5557");
             
             // Se fuerza a fallar el gestor despues de T tiempo de inicio (se configura en milisegundos)
-            /* 
-            final int TiempoT = 1000;
+            /*
+            final int TiempoT = 5000;
             final ZContext cZContext = gestor.getContext();
             Timer timer = new Timer();
             timer.schedule(new TimerTask() {
