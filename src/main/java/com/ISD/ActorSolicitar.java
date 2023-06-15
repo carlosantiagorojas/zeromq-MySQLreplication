@@ -9,13 +9,13 @@ public class ActorSolicitar{
     public ActorSolicitar() {
     }
 
-    public static void main(String[] args) throws Exception {
+    public void iniciar() throws Exception {
 
         try (ZContext context = new ZContext()) {
             
             // Vincular con el puerto de los procesos solicitantes
             ZMQ.Socket socketSolicitar = context.createSocket(SocketType.REP);
-            socketSolicitar.bind("tcp://localhost:5557");
+            socketSolicitar.bind("tcp://10.43.100.136:5557");
 
             String respuestaGestor;
             boolean disponible;
@@ -42,17 +42,16 @@ public class ActorSolicitar{
                 disponible = FuncionesLibro.OperacionSolicitar(codigo);
 
                 // Informar si se actualizo la base de datos
-
                 if(disponible == true)
                 {
-                    respuestaGestor = "El libro SI esta disponible con codigo " + codigo;
+                    respuestaGestor = "El libro con codigo " + codigo + " se solicito exitosamente";
                     socketSolicitar.send(respuestaGestor.getBytes(ZMQ.CHARSET), 0);
                     System.out.println("-----------------------------------------------------------");
                     System.out.println("El libro con codigo " + codigo + " se solicito exitosamente!");
                     System.out.println("-----------------------------------------------------------\n");
                 }
                 else{
-                    respuestaGestor = "El libro NO esta disponible con codigo " + codigo;
+                    respuestaGestor = "El libro con codigo " + codigo + " no se pudo solicitar";
                     socketSolicitar.send(respuestaGestor.getBytes(ZMQ.CHARSET), 0);
                     System.out.println("-----------------------------------------------------------");
                     System.out.println("No se pudo solicitar el libro con codigo " + codigo);

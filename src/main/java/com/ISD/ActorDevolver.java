@@ -23,7 +23,7 @@ public class ActorDevolver {
         ActorDevolver.topico = topico;
     }
 
-    public static void main(String[] args) throws Exception {
+    public void iniciar() throws Exception {
         
         // Suscribir el actor por default al topico Devolucion
         setTopico("Devolucion");
@@ -31,15 +31,17 @@ public class ActorDevolver {
         try (ZContext context = new ZContext()) {
             // Conexion con un puerto para atender las publicaciones asociadas al topico
             ZMQ.Socket subscriber = context.createSocket(SocketType.SUB);
-            subscriber.connect("tcp://localhost:5556");
+            subscriber.connect("tcp://10.43.100.136:5556");
             subscriber.subscribe(getTopico().getBytes(ZMQ.CHARSET)); // Suscribirse al topico para recibir mensajes del publicador
             
             boolean actualizacion;
             // Leer las publicacion que va colocando el publicador
             while (!Thread.currentThread().isInterrupted())
             {
+                // Se recibe el mensaje publicado por el gestor de carga
                 String respuesta = subscriber.recvStr();
                 
+                // Guardar la informacion de la solicitud
                 String [] elem = respuesta.split(" ");
                 String topico = elem[0];
                 int codigo = Integer.parseInt(elem[1]);
@@ -57,12 +59,12 @@ public class ActorDevolver {
                 // Informar si se actualizo la base de datos
                 if(actualizacion == true){
                     System.out.println("-----------------------------------------------------------");
-                    System.out.println("El libro con codigo " + codigo + " se devolvio exitosamente!");
+                    System.out.println("El prestamo con codigo " + codigo + " se devolvio exitosamente!");
                     System.out.println("-----------------------------------------------------------\n");
                 }
                 else{
                     System.out.println("-----------------------------------------------------------");
-                    System.out.println("No se pudo devolver el libro con codigo " + codigo);
+                    System.out.println("No se pudo devolver el prestamo con codigo " + codigo);
                     System.out.println("-----------------------------------------------------------\n");
                 } 
             }

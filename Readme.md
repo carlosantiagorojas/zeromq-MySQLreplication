@@ -113,3 +113,16 @@ Puede probar crando una base de datos en el servidor MASTER, este se debe replic
 Nota: si se tenian bases de datos guardadas anteriormente en el servidor MASTER, estas no se van a crear en la replica. Unicamente se empieza a replicar la información de MASTER al SLAVE despues de haber hecho esta configuracion. 
 
 
+# Ejecucion
+
+Para poder ejecutar el proyecto tiene que modificar el archivo de "requermientos.txt", el cual tiene debe tener los siguientes parametros para cada linea:
+
+```
+<tipo de requerimiento>,<codigo>,<numero de sede>
+```
+
+-Tipo de requerimiento: renovar, devolver, solicitar
+-codigo: si el tipo de requerimiento es solicitar se coloca el codigo del libro, de lo contrario el codigo el prestamo
+-numero de sede: numero de la sede al cual se le envian los requerimientos (1 o 2)
+
+Posteriormente se debe ejecutar los actores de la sede 1 (clases: ExecuteActorDevolver, ExecuteActorRenovar, ExecuteActorSolicitar), los gestores de ambas sedes (clases: ExecuteGCTest, ExecuteGCTestDos) y los proceso solicitantes en el otro computador(clase: PSTest). 

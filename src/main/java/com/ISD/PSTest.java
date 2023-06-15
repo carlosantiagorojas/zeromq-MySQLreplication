@@ -6,6 +6,6 @@ public class PSTest
         
         //Iniciar el proceso solicitante con la ruta del archivo de texto
         PS procesoSolicitante = new PS();
-        procesoSolicitante.inicio("C:\\Pruebas_proyecto\\PruebaUnica.txt");
+        procesoSolicitante.inicio("requerimientos.txt");
     }
 }

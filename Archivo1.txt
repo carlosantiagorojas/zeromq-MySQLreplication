@@ -1,7 +1,0 @@
-devolver,3
-renovar,6
-devolver,10
-solicitar,11
-renovar,7
-renovar,8
-devolver,20

@@ -26,7 +26,7 @@ public class ActorRenovar{
         ActorRenovar.topico = topico;
     }
 
-    public static void main(String[] args) throws Exception {
+    public void iniciar() throws Exception {
         
          // Suscribir el actor por default al topico Renovacion
          setTopico("Renovacion");
@@ -35,13 +35,14 @@ public class ActorRenovar{
 
             // Conexion con un puerto para atender las publicaciones asociadas al topico
             ZMQ.Socket subscriber = context.createSocket(SocketType.SUB);
-            subscriber.connect("tcp://localhost:5556");
+            subscriber.connect("tcp://10.43.100.136:5556");
             subscriber.subscribe(getTopico().getBytes(ZMQ.CHARSET)); // Suscribirse al topico para recibir mensajes del publicador
             
             boolean actualizacion;
             // Leer las publicacion que va colocando el pulblicador
             while (!Thread.currentThread().isInterrupted()) 
-            {
+            {   
+                // Se recibe el mensaje publicado por el gestor de carg
                 String respuesta = subscriber.recvStr();
                 
                 //Guardar la informacion de la solicitud
@@ -61,7 +62,7 @@ public class ActorRenovar{
                 System.out.println("Fecha actual del prestamo: " + fechaActual);
                 System.out.println("Nueva fecha de entrega del prestamo: " + fechaEntrega);
 
-                System.out.println("\nnRealizando actualizacion en la base de datos...");
+                System.out.println("\nRealizando actualizacion en la base de datos...");
                 System.out.println("////////////////////////////////////////////////////////////\n");
                 
                 // Hacer la actualizacion en la base de datos
@@ -71,12 +72,12 @@ public class ActorRenovar{
                 
                 if(actualizacion == true){
                     System.out.println("-----------------------------------------------------------");
-                    System.out.println("El libro con codigo " + codigo +" se renovo exitosamente!");
+                    System.out.println("El prestamo con codigo " + codigo +" se renovo exitosamente!");
                     System.out.println("-----------------------------------------------------------\n");
                 }
                 else{
                     System.out.println("-----------------------------------------------------------");
-                    System.out.println("No se pudo renovar el libro con codigo " + codigo);
+                    System.out.println("No se pudo renovar el prestamo con codigo " + codigo);
                     System.out.println("-----------------------------------------------------------\n");
                 }
                 

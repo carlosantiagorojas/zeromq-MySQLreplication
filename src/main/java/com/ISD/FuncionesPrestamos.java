@@ -16,14 +16,14 @@ public class FuncionesPrestamos{
 
 
     public static boolean OperacionRenovacion(int id, Date fecha) {
-        
-        EnMan.getTransaction().begin();
 
         Prestamos prestamo = EnMan.find(Prestamos.class, id);
 
         if (prestamo == null) {
+            System.out.println();
             System.out.println("Informe....");
             System.out.println("El prestamo con codigo " + id + " que quiere renovar no se encuentra prestado");
+            System.out.println();
             //EnMan.close();
             //EnManFac.close();
 
@@ -31,6 +31,8 @@ public class FuncionesPrestamos{
         }
 
         prestamo.setFechaRenovacion(fecha);
+
+        EnMan.getTransaction().begin();
         EnMan.merge(prestamo);
         EnMan.getTransaction().commit();
         //EnMan.close();
@@ -41,19 +43,21 @@ public class FuncionesPrestamos{
 
     public static boolean EliminarPrestamo(int id) {
 
-        EnMan.getTransaction().begin();
-
         Prestamos prestamo = EnMan.find(Prestamos.class, id);
 
         if (prestamo == null) {
 
-            //System.out.println("El prestamo con codigo " + id + " que quiere devolver no se encuentra prestado");
+            System.out.println();
+            System.out.println("Informe....");
+            System.out.println("El prestamo con codigo " + id + " que quiere devolver no se encuentra prestado");
+            System.out.println();
             //EnMan.close();
             //EnManFac.close();
 
             return false;
         }
 
+        EnMan.getTransaction().begin();
         EnMan.remove(prestamo);
         EnMan.getTransaction().commit();
         //EnMan.close();
@@ -65,37 +69,40 @@ public class FuncionesPrestamos{
 
     public static boolean CrearPrestamo(int libro_ISBN) throws SQLIntegrityConstraintViolationException {
         
-        
-        Prestamos prestamo; 
-        int numeroAleatorio;
-        
-        // Crear un id aleatorio que no este repetido
-        do
+        Libro libro = EnMan.find(Libro.class, libro_ISBN);
+        if(libro != null)
         {
-            Random rand = new Random();
-            numeroAleatorio = rand.nextInt(300) + 1;
-            prestamo = EnMan.find(Prestamos.class, numeroAleatorio);
-
-        }while(prestamo != null);
-
+            Prestamos prestamo; 
+            int numeroAleatorio;
         
-        Calendar c = Calendar.getInstance();
-        c.setTime(new Date());
-        c.add(Calendar.DATE, 7);
-        Date fechaNueva = c.getTime();
+            // Crear un id aleatorio que no este repetido
+            do
+            {
+                Random rand = new Random();
+                numeroAleatorio = rand.nextInt(300) + 1;
+                prestamo = EnMan.find(Prestamos.class, numeroAleatorio);
 
-        prestamo = new Prestamos(numeroAleatorio, fechaNueva, libro_ISBN, 1);
-       
-        EnMan.getTransaction().begin();
-        EnMan.persist(prestamo);
-        EnMan.getTransaction().commit();
+            }while(prestamo != null);
 
-        //EnMan.close();
-        //EnManFac.close();
+            // Generar la nueva fecha
+            Calendar c = Calendar.getInstance();
+            c.setTime(new Date());
+            c.add(Calendar.DATE, 7);
+            Date fechaNueva = c.getTime();
 
-        return true;
+            prestamo = new Prestamos(numeroAleatorio, fechaNueva, libro_ISBN, 1);
+            
+            EnMan.getTransaction().begin();
+            EnMan.persist(prestamo);
+            EnMan.getTransaction().commit();
+
+            //EnMan.close();
+            //EnManFac.close();
+            return true;
+        }
+        else
+            return false;
+    
     }
-
-
 
 }
