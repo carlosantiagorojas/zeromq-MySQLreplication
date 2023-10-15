@@ -1,57 +1,61 @@
-# Configuración del ambiente
+# Project Introduction
 
-Para que el programa funcione correctamente, primero se tiene que configurar las variables de entorno de la siguiente manera:
+This project utilizes the ZeroMQ library to simulate a distributed systems environment and employs MySQL replication for data synchronization.
 
-## Configurar el jdk
+## Environment Configuration
 
-1.Copiar la ruta de acceso a la carpeta bin de tu jdk (solo funciona con jdk version 8 en adelante)
+To ensure the program functions correctly, you need to configure the environment variables as follows:
 
-2.Editar las variables de entorno del sistema
+## Configure JDK
 
-3.En las variables del sistema editar la variable 'PATH'
+1. Copy the path to the bin folder of your JDK (works with JDK version 8 onwards).
 
-4.Añadir la ruta de acceso que copiamos del la carpeta bin del jdk anteriormente
+2. Edit the system environment variables.
 
-5.Le damos OK hasta salir
+3. In the system variables section, edit the 'PATH' variable.
 
-## Configurar maven
+4. Add the path you copied from the bin folder of the JDK.
 
-1.Copiar la ruta de acceso a la carpeta bin de tu maven (descargar el .zip del maven y descomprimirlo en los archivos de programa)
+5. Click OK until you exit.
 
-2.Editar las variables de entorno del sistema
+## Configure Maven
 
-3.En la seccion VARIABLES DEL SISTEMA dar click en editar encima de la variable 'PATH'
+1. Copy the path to the bin folder of your Maven (download the .zip of Maven and extract it into the Program Files).
 
-4.Añadir la ruta de acceso que copiamos del la carpeta bin del maven anteriormente
+2. Edit the system environment variables.
 
-5.Le damos OK hasta salir
+3. In the SYSTEM VARIABLES section, click Edit next to the 'PATH' variable.
 
-## Visual studio code
+4. Add the path you copied from the Maven bin folder.
 
-1.Instalar desde la pagina oficial el IDE de visual studio code para poder ejecutar 
+5. Click OK until you exit.
 
-2.Descargar el "Extension Pack for Java" en las extensiones
+## Visual Studio Code
 
-Para ejecutar algunas pruebas en JMeter
+1. Install the Visual Studio Code IDE from the official website to execute.
 
-1.Copiar el path del archivo de texto
+2. Download the "Extension Pack for Java" in the extensions.
 
-2.Configurar instanciando las clases de acuerdo de las pruebas
+To run some tests in JMeter
 
-# Configuracion de la replica MySQL
+1. Copy the path of the text file.
 
-Se implemento una replica en base al modelo MASTER-SLAVE (replica primaria) que ofrece MYSQL para configurar la replicación, las actualizaciones de esta replica se hacen de manera asincrona.
+2. Configure by instantiating classes according to the tests.
 
-## Configuracion del MASTER
+# MySQL Replica Configuration
 
-1. Ir al archivo de configuración de MYSQL en el servidor MASTER, en este caso se puede llamar my.cnf (para linux) o my.ini (para Windows). Debajo de la seccion de [mysqld] editar:
+A replica was implemented based on the MASTER-SLAVE model (primary replica) offered by MySQL for configuring replication; updates to this replica are done asynchronously.
+
+## MASTER Configuration
+
+1. Go to the MYSQL configuration file on the MASTER server, in this case, it may be called my.cnf (for Linux) or my.ini (for Windows). Below the [mysqld] section, edit:
 
 ```
 server-id = 1
 log-bin=mysql-bin
 ```
 
-2. Abrir la consola de MYSQL y ejecutar los siguentes comandos para crear el usuario y otogar la replicacion a este.
+2. Open the MYSQL console and execute the following commands to create the user and grant replication to it.
 
 ```sql
 CREATE USER 'replication_user'@'10.43.100.141' IDENTIFIED BY 'password';
@@ -59,70 +63,71 @@ GRANT REPLICATION SLAVE ON *.* TO 'replication_user'@'10.43.100.141';
 FLUSH PRIVILEGES;
 ```
 
-- CREATE USER: Se coloca el nombre del usuario que queremos crear seguido de la direccion IP (se puedo colocar un nombre en lugar de la dirección IP si se quiere, este solo es un domnio).
-- IDENTIFIED BY: Se coloca la contraseña que se le quiere otorgar a este usuario que creamos.
+- CREATE USER: Enter the username you want to create followed by the IP address (you can enter a name instead of the IP address if desired; this is just a domain).
+- IDENTIFIED BY: Enter the password you want to assign to this user.
 
-3. Ejecutar el comando para ver el archivo log y la posicion en que se encuentra para guardar estos valores:
+3. Execute the command to view the log file and its position to save these values:
 
 ```sql
 SHOW MASTER STATUS \G
 ```
 
-## Configuracion del SLAVE
+## SLAVE Configuration
 
-4. Ir al archivo de configuración de MYSQL en el servidor SLAVE, en este caso se puede llamar my.cnf (para linux) o my.ini (para Windows). Debajo de la seccion de [mysqld] editar:
+4. Go to the MYSQL configuration file on the SLAVE server, in this case, it may be called my.cnf (for Linux) or my.ini (for Windows). Below the [mysqld] section, edit:
 
 ```
 server-id = 2
 log-bin=mysql-bin
 ```
 
-Es importante que el servir-id sea diferente al del MASTER
+It's important that the server-id is different from the MASTER.
 
-5. Configurar el servidor SLAVE para poder hacer la replicacion con el master, ejecutando el siguiente comando:
+5. Configure the SLAVE server to replicate with the MASTER by executing the following command:
 
 ```sql
 CHANGE REPLICATION SOURCE TO SOURCE_HOST='10.43.100.136', SOURCE_USER='replication_user', SOURCE_PASSWORD='password', SOURCE_LOG_FILE='mysql-bin.000001', SOURCE_LOG_POS=905, SOURCE_SSL=1;
 ```
 
-- SOURCE TO SOURCE_HOST: se coloca la dirección IP del servidor MASTER.
-- SOURCE_USER: usuario que se creo en el servidor MASTER.
-- SOURCE_PASSWORD: contraseña que se le otorgo al usuario en el servidor MASTER.
-- SOURCE_LOG_FILE: archivo log del servidor MASTER que se puede ver en el paso 3.
-- SOURCE_LOG_POS: posición del archivo log del servidor Master que se puede ver en el paso 3.
-- SOURCE_SSL: seguridad de la conexion, en este caso el valor debe ser 1.
+- SOURCE TO SOURCE_HOST: Enter the IP address of the MASTER server.
+- SOURCE_USER: The user created on the MASTER server.
+- SOURCE_PASSWORD: The password assigned to the user on the MASTER server.
+- SOURCE_LOG_FILE: The log file of the MASTER server, as seen in step 3.
+- SOURCE_LOG_POS: The position of the log file of the MASTER server, as seen in step 3.
+- SOURCE_SSL: Connection security, in this case, the value should be 1.
 
-6. Inicar el sevidor SLAVE ejecutando el siguiente comando:
+6. Start the SLAVE server by executing the following command:
 
 ```sql
 START REPLICA USER='replication_user' PASSWORD='password';  
 ```
 
-Aqui se coloca el usuario y el password que se crearon en el servidor MASTER.
+Here, enter the user and password created on the MASTER server.
 
-7. Ver el estado de la configuración de la replica ejecuntado el siguiente comando:
+7. Check the replica configuration status by executing the following command:
 
 ```sql
 SHOW REPLICA STATUS \G   
 ```
 
-Si todo salio correctamente, deberia salir la siguiente informacion: waiting for source to send event
+If everything went correctly, it should display the following information: "waiting for the source to send event."
 
-Puede probar crando una base de datos en el servidor MASTER, este se debe replicar al servidor SLAVE, como tambien el hacer operaciones CRUD en esta base de datos.
+You can test by creating a database on the MASTER server; it should replicate to the SLAVE server, as well as performing CRUD operations in this database.
 
-Nota: si se tenian bases de datos guardadas anteriormente en el servidor MASTER, estas no se van a crear en la replica. Unicamente se empieza a replicar la información de MASTER al SLAVE despues de haber hecho esta configuracion. 
+Note: If you had databases saved on the MASTER server before, they will not be created in the replica. Replication of information from MASTER to SLAVE only starts after this configuration.
 
+# Execution
 
-# Ejecucion
-
-Para poder ejecutar el proyecto tiene que modificar el archivo de "requermientos.txt", el cual tiene debe tener los siguientes parametros para cada linea:
+To run the project, you need to modify the "requirements.txt" file, which should have the following parameters for each line:
 
 ```
-<tipo de requerimiento>,<codigo>,<numero de sede>
+<requirement type>,<code>,<branch number>
 ```
 
--Tipo de requerimiento: renovar, devolver, solicitar
--codigo: si el tipo de requerimiento es solicitar se coloca el codigo del libro, de lo contrario el codigo el prestamo
--numero de sede: numero de la sede al cual se le envian los requerimientos (1 o 2)
+- Requirement type: renew, return, request
+- Code: If the requirement type is request, enter the book code; otherwise, enter the loan code.
+- Branch number: The branch number to which the requirements are sent (1 or 2).
 
-Posteriormente se debe ejecutar los actores de la sede 1 (clases: ExecuteActorDevolver, ExecuteActorRenovar, ExecuteActorSolicitar), los gestores de ambas sedes (clases: ExecuteGCTest, ExecuteGCTestDos) y los proceso solicitantes en el otro computador(clase: PSTest). 
+Afterward, execute the actors for branch 1 (classes: ExecuteActorReturn, ExecuteActorRenew, ExecuteActorRequest), the managers for both branches (classes: ExecuteGCTest, ExecuteGCTestTwo), and the request processes on the other computer (class: PSTest).
+
+Please note that the above text has been translated into English as requested.
