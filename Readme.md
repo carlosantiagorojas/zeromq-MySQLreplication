@@ -129,5 +129,3 @@ To run the project, you need to modify the "requirements.txt" file, which should
 - Branch number: The branch number to which the requirements are sent (1 or 2).
 
 Afterward, execute the actors for branch 1 (classes: ExecuteActorReturn, ExecuteActorRenew, ExecuteActorRequest), the managers for both branches (classes: ExecuteGCTest, ExecuteGCTestTwo), and the request processes on the other computer (class: PSTest).
-
-Please note that the above text has been translated into English as requested.
