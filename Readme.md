@@ -2,11 +2,11 @@
 
 This project utilizes the ZeroMQ library to simulate a distributed systems environment and employs MySQL replication for data synchronization.
 
-## Environment Configuration
+## ⚙️ Environment Configuration
 
 To ensure the program functions correctly, you need to configure the environment variables as follows:
 
-## Configure JDK
+## ☕ Configure JDK
 
 1. Copy the path to the bin folder of your JDK (works with JDK version 8 onwards).
 
@@ -42,11 +42,11 @@ To run some tests in JMeter
 
 2. Configure by instantiating classes according to the tests.
 
-# MySQL Replica Configuration
+# 🔄 MySQL Replica Configuration (WINDOWS)
 
 A replica was implemented based on the MASTER-SLAVE model (primary replica) offered by MySQL for configuring replication; updates to this replica are done asynchronously.
 
-## MASTER Configuration
+## MASTER Configuration 
 
 1. Go to the MYSQL configuration file on the MASTER server, in this case, it may be called my.cnf (for Linux) or my.ini (for Windows). Below the [mysqld] section, edit:
 
@@ -72,7 +72,7 @@ FLUSH PRIVILEGES;
 SHOW MASTER STATUS \G
 ```
 
-## SLAVE Configuration
+## SLAVE Configuration 🤖
 
 4. Go to the MYSQL configuration file on the SLAVE server, in this case, it may be called my.cnf (for Linux) or my.ini (for Windows). Below the [mysqld] section, edit:
 
